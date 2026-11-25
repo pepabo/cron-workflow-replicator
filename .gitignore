@@ -1,0 +1,4 @@
+output/
+bin/
+tools/golangci-lint
+dist/

@@ -1,0 +1,19 @@
+# this file is auto generated; DO NOT EDIT
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  name: '{{.Var.jobName}}-cronworkflow'
+  namespace: '{{.Var.namespace}}'
+spec:
+  schedules:
+    - '{{.Var.schedule}}'
+  workflowSpec:
+    entrypoint: '{{.Var.entrypoint}}'
+    templates:
+      - container:
+          args:
+            - '{{.Var.args}}'
+          command:
+            - '{{.Var.command}}'
+          image: '{{.Var.image}}'
+        name: '{{.Var.entrypoint}}'

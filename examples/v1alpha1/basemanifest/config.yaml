@@ -1,0 +1,83 @@
+units:
+  - outputDirectory: "./output"
+    apiVersion: "v1alpha1"
+    baseManifestPath: "./base-manifest.yaml"
+    values:
+      # Daily ETL job for user data
+      - filename: "user-data-etl"
+        paths:
+          - path: "$.metadata.name"
+            value: "user-data-etl-pipeline"
+          - path: "$.metadata.namespace"
+            value: "production"
+          - path: "$.metadata.labels.environment"
+            value: "prod"
+          - path: "$.metadata.labels.data-type"
+            value: "user"
+          - path: "$.metadata.labels.priority"
+            value: "high"
+          - path: "$.spec.schedules"
+            value: '["0 2 * * *"]'  # Override: Daily at 2 AM
+          - path: "$.spec.workflowSpec.arguments.parameters[0].name"
+            value: "source-table"
+          - path: "$.spec.workflowSpec.arguments.parameters[0].value"
+            value: "users"
+          - path: "$.spec.workflowSpec.arguments.parameters[1].name"
+            value: "target-bucket"
+          - path: "$.spec.workflowSpec.arguments.parameters[1].value"
+            value: "s3://prod-user-data"
+
+      # Weekly analytics aggregation
+      - filename: "weekly-analytics"
+        paths:
+          - path: "$.metadata.name"
+            value: "weekly-analytics-pipeline"
+          - path: "$.metadata.namespace"
+            value: "analytics"
+          - path: "$.metadata.labels.environment"
+            value: "prod"
+          - path: "$.metadata.labels.data-type"
+            value: "analytics"
+          - path: "$.metadata.labels.priority"
+            value: "medium"
+          - path: "$.spec.schedules"
+            value: '["0 4 * * 1"]'  # Override: Weekly on Monday at 4 AM
+          - path: "$.spec.workflowSpec.arguments.parameters[0].name"
+            value: "source-table"
+          - path: "$.spec.workflowSpec.arguments.parameters[0].value"
+            value: "events"
+          - path: "$.spec.workflowSpec.arguments.parameters[1].name"
+            value: "target-bucket"
+          - path: "$.spec.workflowSpec.arguments.parameters[1].value"
+            value: "s3://analytics-warehouse"
+          - path: "$.spec.workflowSpec.arguments.parameters[2].name"
+            value: "aggregation-window"
+          - path: "$.spec.workflowSpec.arguments.parameters[2].value"
+            value: "7d"
+
+      # Development environment job (suspended by default)
+      - filename: "dev-data-sync"
+        paths:
+          - path: "$.metadata.name"
+            value: "dev-data-sync-pipeline"
+          - path: "$.metadata.namespace"
+            value: "development"
+          - path: "$.metadata.labels.environment"
+            value: "dev"
+          - path: "$.metadata.labels.data-type"
+            value: "sync"
+          - path: "$.metadata.labels.priority"
+            value: "low"
+          - path: "$.spec.schedules"
+            value: '["0 6 * * *"]'  # Override: Daily at 6 AM
+          # Temporarily comment out boolean field due to type conversion issue
+          # - path: "$.spec.suspend"
+          #   value: "true"  # Override: Suspend in dev
+          - path: "$.spec.workflowSpec.arguments.parameters[0].name"
+            value: "source-table"
+          - path: "$.spec.workflowSpec.arguments.parameters[0].value"
+            value: "dev_sample"
+          - path: "$.spec.workflowSpec.arguments.parameters[1].name"
+            value: "target-bucket"
+          - path: "$.spec.workflowSpec.arguments.parameters[1].value"
+            value: "s3://dev-data-sync"

@@ -1,0 +1,15 @@
+units:
+  - outputDirectory: "./output"
+    apiVersion: "v1alpha1"
+    baseManifestPath: "manifests/base.yaml"  # Nested relative path
+    values:
+      - filename: "test-workflow"
+        paths:
+          - path: "$.metadata.name"
+            value: "test-workflow"
+          - path: "$.metadata.namespace"
+            value: "test"
+          - path: "$.metadata.labels.environment"
+            value: "test"
+          - path: "$.spec.schedules"
+            value: '["0 12 * * *"]'  # Override schedule
